@@ -2,3 +2,4 @@ pyserial
 numpy
 scipy
 pygame
+matplotlib
