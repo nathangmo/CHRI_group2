@@ -2,9 +2,10 @@ import os
 import time
 import pygame
 import math
+import numpy
 
 class Cable:
-    def __init__(self, anchor, screen, segments=10, length= 5):
+    def __init__(self, anchor, screen, segments=20, length=5):
         # Init parameters
         self.lightning = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "lightning.png")), 0.1)
         self.lightning_enable = False
@@ -108,6 +109,14 @@ class Cable:
         if self.red_rect_rect and self.red_rect_rect.collidepoint(mouse_pos):
             return "red"
         return None
+    def get_force(self):
+        end = self.points[-1]
+        prev = self.points[-2]
+        direction = end - prev    
+        unit_direction = direction.normalize()
+
+
+        return unit_direction * 1.5 #TODO hier schaal factor berekenen op basis van gewicht etc
 
 def draw_vector_file(inputfile: str):
     pygame.image.load(inputfile)

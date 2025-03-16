@@ -11,7 +11,7 @@ device_connected = physics.is_device_connected()
 
 # Parameters
 W, H = 800, 600
-window_scale = 3200
+window_scale = 4000
 screen = pygame.display.set_mode((W, H))
 pygame.display.set_caption("Cable Sim")
 
@@ -59,7 +59,11 @@ while run:
                         print("Locked")
     
     if device_connected:
-        physics.update_force(np.zeros(2))
+        F = np.zeros(2)
+        for cable in cables:
+            if not cable.locked:
+                F = cable.get_force()
+        physics.update_force(F)
 
     
     
