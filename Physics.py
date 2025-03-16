@@ -104,6 +104,34 @@ class Physics:
         pB = ( self.l1*math.cos(a2)+self.d, self.l1*math.sin(a2) )
         return pA0,pB0,pA,pB,device_position
     
+    def get_mouse_pos(self, window_scale, window_size):
+        if self.haplyBoard.data_available():
+            pA0,pB0,pA,pB,pE = self.get_device_pos() #positions of the various points of the pantograph
+            pA0,pB0,pA,pB,xh = self.convert_pos((pA0,pB0,pA,pB,pE), window_scale=window_scale, window_size=window_size) #convert the physical positions to screen coordinates
+
+            return (int(xh[0]), int(xh[1]))
+
+    def convert_pos(self, positions, window_size, window_scale):
+        #invert x because of screen axes
+        # 0---> +X
+        # |
+        # |
+        # v +Y
+        device_origin = (int(window_size[0]/2.0 + 0.038/2.0*window_scale),0)
+
+        converted_positions = []
+        for physics_pos in positions:
+            x = device_origin[0]-physics_pos[0]*window_scale
+            y = device_origin[1]+physics_pos[1]*window_scale
+            converted_positions.append([x,y])
+        if len(converted_positions)<=0:
+            return None
+        elif len(converted_positions)==1:
+            return converted_positions[0]
+        else:
+            return converted_positions
+
+
     def update_force(self,f):
         #Send forces to the device. Only works if a device is connected!
         if self.device_present and self.port:
