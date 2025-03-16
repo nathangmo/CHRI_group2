@@ -1,3 +1,5 @@
+import os
+import time
 import pygame
 import math
 
@@ -24,6 +26,10 @@ def convert_pos(*positions, window_size, window_scale):
 class Cable:
     def __init__(self, anchor, screen, segments=10, length= 5):
         # Init parameters
+        self.lightning = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "lightning.png")), 0.1)
+        self.lightning_enable = False
+        self.lightning_enabled_on = time.time()
+        self.lightning_show_for = 5 #seconds
         self.screen = screen
         self.SEGMENTS, self.LENGTH = segments, length
         self.GRAVITY = pygame.Vector2(0, 5.0)
@@ -95,6 +101,25 @@ class Cable:
         self.green_square_rect.center = end - unit_direction * 6
     
         self.screen.blit(rotated_square, self.green_square_rect.topleft)
+
+        # --- Draw Shocked ---
+        if self.lightning_enable:
+            time_to_run = self.lightning_enabled_on + self.lightning_show_for - time.time()
+            rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(time_to_run*math.pi*2)+1)/2), -angle)
+            
+            self.shock_square_rect = rotated_square.get_rect()
+            self.shock_square_rect.center = end+pygame.Vector2(30,0) - unit_direction * 6
+        
+            self.screen.blit(rotated_square, self.shock_square_rect.topleft)
+
+            if time_to_run < 0:
+                self.lightning_enable = False
+
+    def enable_lightning(self, show_for = None):
+        if show_for is not None:
+            self.lightning_show_for = show_for
+        self.lightning_enable = True
+        self.lightning_enabled_on = time.time()
     
     def check_hover_status(self, mouse_pos):
         # Check where the mouse is hovering

@@ -1,5 +1,5 @@
+import os
 import pygame
-import math
 from helpers import Cable
 
 pygame.init()
@@ -8,7 +8,6 @@ pygame.init()
 W, H = 800, 600
 screen = pygame.display.set_mode((W, H))
 pygame.display.set_caption("Cable Sim")
-
 
 cables = [
     Cable((W // 6, H // 4), screen),
@@ -33,9 +32,10 @@ while run:
                         
                         if status == "red":
                             print("Shocked")
+                            cable.enable_lightning(5)
                         elif status == "green":
                             print("Safe")
-                            cable.locked = False  
+                            cable.locked = False 
                     
                     # Locking the cable to the current mouse position
                     else:

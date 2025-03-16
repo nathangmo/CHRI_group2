@@ -20,17 +20,16 @@ def run():
         pass
         xh = np.array([400,300])
 
-    fe = np.array([0.0,0.0]) #fx,fy
+    fe = np.array([0.0,0.0])
 
     for event in pygame.event.get(): # interrupt function
         if event.type == pygame.QUIT: # force quit with closing the window
             running = False
         elif event.type == pygame.KEYUP:
-            if event.key==ord("q"): #q for quit, ord() gets the unicode of the given character
+            if event.key==ord("q"):
                 running = False
-            if event.key == ord('m'): #Change the visibility of the mouse
+            if event.key == ord('m'):
                 pygame.mouse.set_visible(not pygame.mouse.get_visible())
-        #you can add more if statements to handle additional key characters
     
     window.fill((255,255,255))
     
