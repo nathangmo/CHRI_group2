@@ -21,7 +21,7 @@ cables = [
     Cable((W // 6, H // 4 + 200), screen)
 ]
 
-handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.3).convert()
+handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.75).convert_alpha(screen)
 
 run = True
 while run:
@@ -39,7 +39,7 @@ while run:
         elif event.type == pygame.KEYUP:
             if event.key == ord('q'):
                 run = False
-            elif event.key == ord('f'):
+            elif event.key == ord(' '):
                 for cable in cables:
                     # Unlocking the cable or warning the user based on mouse position
                     if cable.locked:
