@@ -83,10 +83,6 @@ while run:
         for cable in cables:
             F_cables += cable.get_lightning_force()
 
-        F = F_cables + F_locked_cable
-        physics.update_force(F)
-
-    
     
     
     for cable in cables:
@@ -97,13 +93,13 @@ while run:
         if wall.check_collision(cable.points[-1]):
             print("Cable is through the hole!")
 
-        proxy_pos, F = wall.collision_control(cable.points[-1])
+        proxy_pos, F_wall = wall.collision_control(cable.points[-1])
 
-        if device_connected:
-            physics.update_force(F)
+    if device_connected:
+        F = F_cables + F_locked_cable + F_wall
+        physics.update_force(F)
 
     screen.blit(handle, handle.get_rect(center = mouse_pos))
-
     pygame.display.flip()
 
 physics.close()

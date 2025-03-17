@@ -202,8 +202,5 @@ class Wall:
         return proxy_pos, fe  # Return adjusted position and force
 
 
-def draw_vector_file(inputfile: str):
-    pygame.image.load(inputfile)
-
 
 
