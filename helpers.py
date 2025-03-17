@@ -2,7 +2,7 @@ import os
 import time
 import pygame
 import math
-import numpy as np
+import numpy
 
 class Cable:
     def __init__(self, anchor, screen, segments=20, length=5):
@@ -11,6 +11,7 @@ class Cable:
         self.lightning_enable = False
         self.lightning_enabled_on = time.time()
         self.lightning_show_for = 5 #seconds
+        self.lightning_time_to_run = 0
         self.screen = screen
         self.SEGMENTS, self.LENGTH = segments, length
         self.GRAVITY = pygame.Vector2(0, 5.0)
@@ -71,6 +72,8 @@ class Cable:
         self.red_rect_rect = rotated_rect.get_rect()
         self.red_rect_rect.center = end + unit_direction * 10
 
+        self.red_rect_rect.center = end + unit_direction * 16
+
         self.screen.blit(rotated_rect, self.red_rect_rect.topleft)
 
         # --- Safe Connection Area (Green Port) ---
@@ -79,21 +82,28 @@ class Cable:
 
         rotated_square = pygame.transform.rotate(square, -angle)
         self.green_square_rect = rotated_square.get_rect()
+        self.green_square_rect.center = end
+    
         self.green_square_rect.center = end - unit_direction * 6
 
         self.screen.blit(rotated_square, self.green_square_rect.topleft)
 
         # --- Draw Shocked ---
         if self.lightning_enable:
+            self.lightning_time_to_run = self.lightning_enabled_on + self.lightning_show_for - time.time()
+            rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(self.lightning_time_to_run*math.pi*2)+1)/2), -angle)
+            
             time_to_run = self.lightning_enabled_on + self.lightning_show_for - time.time()
             rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(time_to_run*math.pi*2)+1)/2), -angle)
 
             self.shock_square_rect = rotated_square.get_rect()
+            self.shock_square_rect.center = end + 24*unit_direction
+        
             self.shock_square_rect.center = end+30*unit_direction - unit_direction * 6
 
             self.screen.blit(rotated_square, self.shock_square_rect.topleft)
 
-            if time_to_run < 0:
+            if self.lightning_time_to_run < 0:
                 self.lightning_enable = False
 
     def enable_lightning(self, show_for = None):
@@ -109,6 +119,14 @@ class Cable:
         if self.red_rect_rect and self.red_rect_rect.collidepoint(mouse_pos):
             return "red"
         return None
+
+    def get_lightning_force(self):
+        if self.lightning_enable:
+            lightning_perturbation = pygame.Vector2(math.sin(self.lightning_time_to_run*10), math.cos(self.lightning_time_to_run*10))
+        else:
+            lightning_perturbation = pygame.Vector2(0, 0)
+        return 3*lightning_perturbation
+
     def get_force(self):
         end = self.points[-1]
         prev = self.points[-2]

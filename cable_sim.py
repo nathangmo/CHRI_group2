@@ -34,7 +34,6 @@ wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size)
 
 handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.3).convert()
 
-
 run = True
 while run:
     time.sleep(0.01)
@@ -51,7 +50,7 @@ while run:
         elif event.type == pygame.KEYUP:
             if event.key == ord('q'):
                 run = False
-            elif event.key == ord('f'):
+            elif event.key == ord(' '):
                 for cable in cables:
                     # Unlocking the cable or warning the user based on mouse position
                     if cable.locked:
@@ -74,10 +73,21 @@ while run:
 
     if device_connected:
         F = np.zeros(2)
+        F_locked_cable = np.zeros(2)
+        F_cables = np.zeros(2)
         for cable in cables:
             if not cable.locked:
-                F = cable.get_force()
+                F_locked_cable = cable.get_force()
+
+        F_cables = pygame.Vector2(0,0)
+        for cable in cables:
+            F_cables += cable.get_lightning_force()
+
+        F = F_cables + F_locked_cable
         physics.update_force(F)
+
+    
+    
     
     for cable in cables:
         cable.update(mouse_pos)
