@@ -2,7 +2,7 @@ import os
 import time
 import pygame
 import math
-import numpy
+import numpy as np
 
 class Cable:
     def __init__(self, anchor, screen, segments=20, length=5):
@@ -71,8 +71,6 @@ class Cable:
         rotated_rect = pygame.transform.rotate(rectangle, -angle)
         self.red_rect_rect = rotated_rect.get_rect()
         self.red_rect_rect.center = end + unit_direction * 10
-
-        self.red_rect_rect.center = end + unit_direction * 16
 
         self.screen.blit(rotated_rect, self.red_rect_rect.topleft)
 
