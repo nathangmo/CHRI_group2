@@ -2,7 +2,6 @@ import os
 import time
 import pygame
 import math
-import numpy as np
 
 class Cable:
     def __init__(self, anchor, screen, segments=20, length=5):
@@ -130,7 +129,7 @@ class Cable:
         prev = self.points[-2]
         direction = end - prev
         unit_direction = direction.normalize()
-        return unit_direction * 1.5 #TODO hier schaal factor berekenen op basis van gewicht etc
+        return unit_direction #TODO hier schaal factor berekenen op basis van gewicht etc
 
 class Wall:
     def __init__(self, screen, position, size, hole_position, hole_size):
@@ -139,7 +138,7 @@ class Wall:
         self.size = size
         self.hole_position = hole_position
         self.hole_size = hole_size
-        self.prev_xh = np.array([0.0, 0.0])
+        self.prev_xh = pygame.Vector2(0.0, 0.0)
         self.kc = 100  # Stiffness constant for the force feedback
 
         # Define the full wall and the hole as pygame.Rect objects
@@ -178,27 +177,27 @@ class Wall:
 
         # Store previous position
         prev_hx, prev_hy = self.prev_xh
-        self.prev_xh = np.array([hx, hy])
+        self.prev_xh = pygame.Vector2([hx, hy])
 
-        proxy_pos = np.array([hx, hy])
-        fe = np.array([0.0, 0.0])
+        proxy_pos = pygame.Vector2([hx, hy])
+        fe = pygame.Vector2([0.0, 0.0])
 
         # Check if cable end is inside the wall but NOT in the hole
         if self.wall_rect.collidepoint(hx, hy) and not self.hole_rect.collidepoint(hx, hy):
 
             fe[0] = self.kc * (self.wall_rect.left - hx)
-            proxy_pos = np.array([self.wall_rect.left, hy])
+            proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
 
-            proxy = pygame.Rect((proxy_pos.astype(int)-(20, 8)), (20, 8))
+            proxy = pygame.Rect((proxy_pos-(20, 8)), (20, 8))
             pygame.draw.rect(self.screen, (255, 0, 0), proxy)
 
-            force_end = proxy_pos.astype(int) - fe * 0.01  # Scale factor for drawing
+            force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
             pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
 
         else:
             self.entry_side = None  # Reset when outside the wall
-
+        print(fe)
         return proxy_pos, fe  # Return adjusted position and force
 
 
