@@ -60,9 +60,17 @@ while run:
     
     if device_connected:
         F = np.zeros(2)
+        F_locked_cable = np.zeros(2)
+        F_cables = np.zeros(2)
         for cable in cables:
             if not cable.locked:
-                F = cable.get_force()
+                F_locked_cable = cable.get_force()
+        
+        F_cables = pygame.Vector2(0,0)
+        for cable in cables:
+            F_cables += cable.get_lightning_force()
+
+        F = F_cables + F_locked_cable
         physics.update_force(F)
 
     

@@ -11,6 +11,7 @@ class Cable:
         self.lightning_enable = False
         self.lightning_enabled_on = time.time()
         self.lightning_show_for = 5 #seconds
+        self.lightning_time_to_run = 0
         self.screen = screen
         self.SEGMENTS, self.LENGTH = segments, length
         self.GRAVITY = pygame.Vector2(0, 5.0)
@@ -85,15 +86,15 @@ class Cable:
 
         # --- Draw Shocked ---
         if self.lightning_enable:
-            time_to_run = self.lightning_enabled_on + self.lightning_show_for - time.time()
-            rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(time_to_run*math.pi*2)+1)/2), -angle)
+            self.lightning_time_to_run = self.lightning_enabled_on + self.lightning_show_for - time.time()
+            rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(self.lightning_time_to_run*math.pi*2)+1)/2), -angle)
             
             self.shock_square_rect = rotated_square.get_rect()
             self.shock_square_rect.center = end+30*unit_direction - unit_direction * 6
         
             self.screen.blit(rotated_square, self.shock_square_rect.topleft)
 
-            if time_to_run < 0:
+            if self.lightning_time_to_run < 0:
                 self.lightning_enable = False
 
     def enable_lightning(self, show_for = None):
@@ -109,6 +110,14 @@ class Cable:
         if self.red_rect_rect and self.red_rect_rect.collidepoint(mouse_pos):
             return "red"
         return None
+    
+    def get_lightning_force(self):
+        if self.lightning_enable:
+            lightning_perturbation = pygame.Vector2(math.sin(self.lightning_time_to_run*10), math.cos(self.lightning_time_to_run*10))
+        else:
+            lightning_perturbation = pygame.Vector2(0, 0)
+        return 3*lightning_perturbation
+
     def get_force(self):
         end = self.points[-1]
         prev = self.points[-2]
@@ -117,6 +126,3 @@ class Cable:
 
 
         return unit_direction * 1.5 #TODO hier schaal factor berekenen op basis van gewicht etc
-
-def draw_vector_file(inputfile: str):
-    pygame.image.load(inputfile)
