@@ -2,7 +2,7 @@ import os
 import time
 import pygame
 import math
-import numpy
+
 
 class Cable:
     def __init__(self, anchor, screen, segments=20, length=5):
@@ -70,7 +70,7 @@ class Cable:
     
         rotated_rect = pygame.transform.rotate(rectangle, -angle)
         self.red_rect_rect = rotated_rect.get_rect()
-        self.red_rect_rect.center = end + unit_direction * 10
+        self.red_rect_rect.center = end + unit_direction * 16
     
         self.screen.blit(rotated_rect, self.red_rect_rect.topleft)
     
@@ -80,7 +80,7 @@ class Cable:
     
         rotated_square = pygame.transform.rotate(square, -angle)
         self.green_square_rect = rotated_square.get_rect()
-        self.green_square_rect.center = end - unit_direction * 6
+        self.green_square_rect.center = end
     
         self.screen.blit(rotated_square, self.green_square_rect.topleft)
 
@@ -90,7 +90,7 @@ class Cable:
             rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(self.lightning_time_to_run*math.pi*2)+1)/2), -angle)
             
             self.shock_square_rect = rotated_square.get_rect()
-            self.shock_square_rect.center = end+30*unit_direction - unit_direction * 6
+            self.shock_square_rect.center = end + 24*unit_direction
         
             self.screen.blit(rotated_square, self.shock_square_rect.topleft)
 
