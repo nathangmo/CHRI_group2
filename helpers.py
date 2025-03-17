@@ -197,7 +197,6 @@ class Wall:
 
         else:
             self.entry_side = None  # Reset when outside the wall
-        print(fe)
         return proxy_pos, fe  # Return adjusted position and force
 
 

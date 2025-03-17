@@ -23,12 +23,9 @@ cables = [
 ]
 
 wall_pos = (700,0)
-wall_size = (800-wall_pos[0], 600)
+wall_size = (1200-wall_pos[0], 600)
 hole_size = (22,10) # one pixel on each end bigger
 hole_pos = (wall_pos[0]+(hole_size[0]/2), wall_size[1]/2)
-
-
-
 wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size)
 
 handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.75).convert_alpha(screen)
