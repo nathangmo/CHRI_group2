@@ -9,6 +9,7 @@ import time
 pygame.init()
 physics = Physics(hardware_version=3)
 device_connected = physics.is_device_connected()
+pygame.mouse.set_visible(False)
 
 # Parameters
 W, H = 800, 600
@@ -63,7 +64,7 @@ try:
                         # Locking the cable to the current mouse position
                         else:
                             cable.locked = True
-                            cable.locked_position = pygame.Vector2(cable.points[-1])
+                            cable.locked_position = pygame.Vector2(mouse_pos)
                             print("Locked")
 
         wall.draw()
