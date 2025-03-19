@@ -133,47 +133,47 @@ class Cable:
         return unit_direction #TODO hier schaal factor berekenen op basis van gewicht etc
 
 class Wall:
-    def __init__(self, screen, position, size, hole_position, hole_size):
+    def __init__(self, screen, position, size, holes_positions, hole_size, hole_colors):
         self.screen = screen
         self.position = position
         self.size = size
-        self.hole_position = hole_position
+        self.holes_positions = holes_positions
         self.hole_size = hole_size
+        self.hole_colors = hole_colors
         self.prev_xh = pygame.Vector2(0.0, 0.0)
         self.kc = 100  # Stiffness constant for the force feedback
+        self.holes_rects = list()
 
         # Define the full wall and the hole as pygame.Rect objects
         self.wall_rect = pygame.Rect(self.position, self.size)
-        self.hole_rect = pygame.Rect(
-            self.hole_position[0] - self.hole_size[0] // 2,
-            self.hole_position[1] - self.hole_size[1] // 2,
-            self.hole_size[0],
-            self.hole_size[1]
-        )
+        for hole in self.holes_positions:
+            self.holes_rects.append(pygame.Rect(
+                                    hole[0] - self.hole_size[0] // 2,
+                                    hole[1] - self.hole_size[1] // 2,
+                                    self.hole_size[0],
+                                    self.hole_size[1])
+                                    )
+            
 
     def draw(self):
         wall_rect = pygame.Rect(self.position, self.size)
-        pygame.draw.rect(self.screen, (20, 20, 20), wall_rect)
+        pygame.draw.rect(self.screen, (64, 64, 64), wall_rect)
 
-        hole_rect = pygame.Rect(
-            self.hole_position[0] - self.hole_size[0] // 2,
-            self.hole_position[1] - self.hole_size[1] // 2,
-            self.hole_size[0],
-            self.hole_size[1]
-        )
-        pygame.draw.rect(self.screen, (100, 100, 100), hole_rect)
+        for i, hole_rect in enumerate(self.holes_rects):
+            pygame.draw.rect(self.screen, self.hole_colors[i], hole_rect)
 
     def check_collision(self, cable_end_pos):
-        hole_rect = pygame.Rect(
-            self.hole_position[0] - self.hole_size[0] // 2,
-            self.hole_position[1] - self.hole_size[1] // 2,
-            self.hole_size[0],
-            self.hole_size[1]
-        )
+        for hole_rect in self.holes_rects:
+            if hole_rect.collidepoint(cable_end_pos):
+                return False
+        
+        
+        if self.wall_rect.collidepoint(cable_end_pos):
+            return True
+                
+        return False
 
-        return hole_rect.collidepoint(cable_end_pos)
-
-    def collision_control(self, cable_end_pos):
+    def collision_control(self, cable_end_pos, cable):
         hx, hy = cable_end_pos  # Cable end position
 
         # Store previous position
@@ -184,17 +184,18 @@ class Wall:
         fe = pygame.Vector2([0.0, 0.0])
 
         # Check if cable end is inside the wall but NOT in the hole
-        if self.wall_rect.collidepoint(hx, hy) and not self.hole_rect.collidepoint(hx, hy):
+        if self.check_collision(cable_end_pos):
 
             fe[0] = self.kc * (self.wall_rect.left - hx)
             proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
 
-            proxy = pygame.Rect((proxy_pos-(20, 8)), (20, 8))
-            pygame.draw.rect(self.screen, (255, 0, 0), proxy)
+            if not cable.locked:
+                proxy = pygame.Rect((proxy_pos-(20, 8)), (20, 8))
+                pygame.draw.rect(self.screen, (255, 0, 0), proxy)
 
-            force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
-            pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
+                force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
+                pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
 
         else:
             self.entry_side = None  # Reset when outside the wall

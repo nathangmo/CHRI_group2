@@ -26,8 +26,16 @@ cables = [
 wall_pos = (700,0)
 wall_size = (1200-wall_pos[0], 600)
 hole_size = (22,10) # one pixel on each end bigger
-hole_pos = (wall_pos[0]+(hole_size[0]/2), wall_size[1]/2)
-wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size)
+hole_pos = [(wall_pos[0]+(hole_size[0]/2), wall_size[1]/3),
+            (wall_pos[0]+(hole_size[0]/2), wall_size[1]/2),
+            (wall_pos[0]+(hole_size[0]/2), 2*wall_size[1]/3),
+            ]
+hole_colors = [
+    (0, 77/2, 64/2),
+    (30/2, 136/2, 229/2),
+    (255/2, 193/2, 7/2)
+]
+wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size, hole_colors)
 
 handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.75).convert_alpha(screen)
 
@@ -89,8 +97,9 @@ try:
             if wall.check_collision(cable.points[-1]):
                 print("Cable is through the hole!")
 
-            proxy_pos, F_wall_part = wall.collision_control(cable.points[-1])
-            F_wall += F_wall_part
+            proxy_pos, F_wall_part = wall.collision_control(cable.points[-1], cable)
+            if not cable.locked:
+                F_wall += F_wall_part
 
         if device_connected:
             F = F_shock + F_locked_cable - F_wall
