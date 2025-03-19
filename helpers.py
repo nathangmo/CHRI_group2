@@ -5,7 +5,7 @@ import math
 
 
 class Cable:
-    def __init__(self, anchor, screen, segments=20, length=5):
+    def __init__(self, anchor, screen, colour, segments=20, length=5):
         # Init parameters
         self.lightning = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "lightning.png")), 0.1)
         self.lightning_enable = False
@@ -20,6 +20,7 @@ class Cable:
         self.old_points = self.points[:]
         self.locked = True  # Initially locked
         self.locked_position = pygame.Vector2(anchor[0] + 100, anchor[1]) 
+        self.colour = colour
 
     def update(self, target):
         # Apply physics to each segment
@@ -66,7 +67,7 @@ class Cable:
     
         # --- Connector (Red Plug) ---
         rectangle = pygame.Surface((20, 8), pygame.SRCALPHA)
-        rectangle.fill((255, 0, 0))
+        rectangle.fill((216, 27, 96))
     
         rotated_rect = pygame.transform.rotate(rectangle, -angle)
         self.red_rect_rect = rotated_rect.get_rect()
@@ -76,7 +77,7 @@ class Cable:
     
         # --- Safe Connection Area (Green Port) ---
         square = pygame.Surface((12, 12), pygame.SRCALPHA)
-        square.fill((0, 255, 0))
+        square.fill(self.colour)
     
         rotated_square = pygame.transform.rotate(square, -angle)
         self.green_square_rect = rotated_square.get_rect()
