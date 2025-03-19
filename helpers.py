@@ -2,6 +2,8 @@ import os
 import time
 import pygame
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Cable:
     def __init__(self, anchor, screen, colour, segments=20, length=5):
@@ -199,5 +201,65 @@ class Wall:
         return proxy_pos, fe  # Return adjusted position and force
 
 
+
+
+
+
+
+
+def plot_data(review_data):
+
+    t = list()
+    force = list()
+    end_pos = list()
+    mouse_pos = list()
+    for item in review_data:
+        t.append(item['time'])
+        force.append(item['Force'])
+        end_pos.append(item['end_pos'])
+        mouse_pos.append(item['mouse_pos'])
+
+    force = np.array(force)
+    end_pos = np.array(end_pos)
+    mouse_pos = np.array(mouse_pos)
+
+    plt.subplot(413)
+    plt.plot(t,force,"b")
+    plt.plot(t,force,"r")
+    plt.ylabel("F [N]")
+    plt.show()
+
+    plt.figure(3)
+    plt.subplot(411)
+    plt.title("VARIABLES")
+    plt.plot(t,end_pos[:,0],"b",label="x")
+    plt.plot(t,end_pos[:,1],"r",label="y")
+    plt.legend()
+    plt.ylabel("end_pos [m]")
+
+    plt.subplot(412)
+    plt.plot(t,mouse_pos[:,0],"b")
+    plt.plot(t,mouse_pos[:,1],"r")
+    plt.ylabel("mouse_pos [m]")
+
+
+
+
+
+    # plt.figure(4)
+    # plt.title("ENDPOINT BEHAVIOUR")
+    # plt.plot(0,0,"ok",label="shoulder")
+    # plt.plot(state[:,1],state[:,2],"lime",label="reference")
+    # plt.plot(state[:,3],state[:,4],"r",label="actual")
+    # plt.axis('equal')
+    # plt.xlabel("x [m]")
+    # plt.ylabel("y [m]")
+    # plt.legend()
+
+    # plt.tight_layout()
+
+
+
+    plt.show()
 
 

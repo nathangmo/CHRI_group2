@@ -3,9 +3,11 @@ import traceback
 import pygame
 from helpers import Cable
 from helpers import Wall
-
+from helpers import plot_data
 from Physics import Physics
 import time
+import json
+import datetime
 
 pygame.init()
 physics = Physics(hardware_version=3)
@@ -42,12 +44,16 @@ handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirnam
 cables[0].update((0,0))
 cables[0].draw_connector_end()
 
+shocks = 0
+review_data = list()
+start_time = time.time()
 
 run = True
 try:
     while run:
         time.sleep(0.01)
         screen.fill((255, 255, 255))
+        data = dict()
 
         if device_connected:
             mouse_pos = physics.get_mouse_pos(window_scale=window_scale, window_size=(W, H))
@@ -82,6 +88,7 @@ try:
                             if status == "red":
                                 print("Shocked")
                                 cable.enable_lightning(5)
+                                shocks += 1
                             elif status == "green":
                                 print("Safe")
                                 cable.locked = False 
@@ -94,15 +101,14 @@ try:
 
         wall.draw()
 
-        if device_connected:
-            F_locked_cable = pygame.Vector2(0,0)
-            for cable in cables:
-                if not cable.locked:
-                    F_locked_cable = cable.get_force()
+        F_locked_cable = pygame.Vector2(0,0)
+        for cable in cables:
+            if not cable.locked:
+                F_locked_cable = cable.get_force()
 
-            F_shock = pygame.Vector2(0,0)
-            for cable in cables:
-                F_shock += cable.get_lightning_force()
+        F_shock = pygame.Vector2(0,0)
+        for cable in cables:
+            F_shock += cable.get_lightning_force()
 
         
         F_wall = pygame.Vector2(0,0)
@@ -118,15 +124,32 @@ try:
             if not cable.locked:
                 F_wall += F_wall_part
 
+        F = F_shock + F_locked_cable - F_wall
         if device_connected:
-            F = F_shock + F_locked_cable - F_wall
             physics.update_force(F)
+        
+
+        
 
         screen.blit(handle, handle.get_rect(center = mouse_pos))
         pygame.display.flip()
+
+        data['time'] = time.time()-start_time
+        data['Force'] = (F[0], F[1])
+        data['Force_locked_cable'] = (F_locked_cable[0], F_locked_cable[1])
+        data['Force_wall'] = (F_wall[0], F_wall[1])
+        data['mouse_pos'] = mouse_pos
+        data['end_pos'] = end_pos
+        data['shocks'] = shocks
+        review_data.append(data)
 except Exception as e:
     print(f"Exception occured: {e}")
     traceback.print_exc()
 
 physics.close()
 pygame.quit()
+
+with open(f"Cable_data_{datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.json", 'w') as file:
+    json.dump(review_data, file)
+
+plot_data(review_data)
