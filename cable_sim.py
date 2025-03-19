@@ -1,4 +1,5 @@
 import os
+import traceback
 import pygame
 from helpers import Cable
 from helpers import Wall
@@ -125,6 +126,7 @@ try:
         pygame.display.flip()
 except Exception as e:
     print(f"Exception occured: {e}")
+    traceback.print_exc()
 
 physics.close()
 pygame.quit()
