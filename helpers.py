@@ -21,7 +21,6 @@ class Cable:
         self.locked_position = pygame.Vector2(anchor[0] + 100, anchor[1]) 
         self.colour = colour
 
-
     def update(self, target):
         # Apply physics to each segment
         for i in range(1, self.SEGMENTS):
@@ -162,13 +161,13 @@ class Wall:
         for i, hole_rect in enumerate(self.holes_rects):
             pygame.draw.rect(self.screen, self.hole_colors[i], hole_rect)
 
-    def check_collision(self, cable_end_pos):
+    def check_collision(self, red_rect):
         for hole_rect in self.holes_rects:
-            if hole_rect.collidepoint(cable_end_pos):
+            if hole_rect.colliderect(red_rect):
                 return False
         
         
-        if self.wall_rect.collidepoint(cable_end_pos):
+        if self.wall_rect.colliderect(red_rect):
             return True
                 
         return False
@@ -184,15 +183,13 @@ class Wall:
         fe = pygame.Vector2([0.0, 0.0])
 
         # Check if cable end is inside the wall but NOT in the hole
-        if self.check_collision(cable_end_pos):
+        if self.check_collision(red_rect=cable.red_rect_rect):
 
             fe[0] = self.kc * (self.wall_rect.left - hx)
             proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
 
             if not cable.locked:
-                proxy = pygame.Rect((proxy_pos-(20, 8)), (20, 8))
-                pygame.draw.rect(self.screen, (255, 0, 0), proxy)
 
                 force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
                 pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)

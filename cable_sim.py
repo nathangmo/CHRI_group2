@@ -38,6 +38,9 @@ hole_colors = [
 wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size, hole_colors)
 
 handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.75).convert_alpha(screen)
+cables[0].update((0,0))
+cables[0].draw_connector_end()
+
 
 run = True
 try:
@@ -49,6 +52,19 @@ try:
             mouse_pos = physics.get_mouse_pos(window_scale=window_scale, window_size=(W, H))
         else:
             mouse_pos = pygame.mouse.get_pos()
+        mouse_rect = pygame.rect.Rect(*mouse_pos, 1,1)
+        
+        
+        unlocked_cable = cables[0]
+        for cable in cables:
+            if not cable.locked:
+                unlocked_cable = cable
+        if not wall.check_collision(mouse_rect):
+            end_pos = mouse_pos
+        elif wall.check_collision(red_rect=unlocked_cable.red_rect_rect):
+            end_pos = (700,mouse_pos[1])
+        else:
+            end_pos = mouse_pos
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -90,14 +106,14 @@ try:
         
         F_wall = pygame.Vector2(0,0)
         for cable in cables:
-            cable.update(mouse_pos)
+            cable.update(end_pos)
             cable.draw()
 
             # Check if cable end is inside the hole
-            if wall.check_collision(cable.points[-1]):
+            if wall.check_collision(unlocked_cable.red_rect_rect):
                 print("Cable is through the hole!")
 
-            proxy_pos, F_wall_part = wall.collision_control(cable.points[-1], cable)
+            proxy_pos, F_wall_part = wall.collision_control(mouse_pos, cable)
             if not cable.locked:
                 F_wall += F_wall_part
 
