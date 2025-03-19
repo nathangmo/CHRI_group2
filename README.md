@@ -15,6 +15,7 @@ Task completion and time with dynamic force assist is better than with constant 
 ## review data:
 - PA2 plots
 - electric shock
+- subject started with controller a / b / c
 
 
 ## Planning
