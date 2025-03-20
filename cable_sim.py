@@ -108,7 +108,7 @@ try:
         F_locked_cable = pygame.Vector2(0,0)
         for cable in cables:
             if not cable.locked:
-                F_locked_cable = cable.get_force()
+                F_locked_cable = cable.get_force_weight()
 
         F_shock = pygame.Vector2(0,0)
         for cable in cables:
@@ -122,7 +122,7 @@ try:
 
             # Check if cable end is inside a hole
             if wall.check_in_hole(unlocked_cable.red_rect_rect):
-                print("Cable is in a hole!")
+                print(f"Cable{unlocked_cable.colour} is in a hole!")
 
             proxy_pos, F_wall_part = wall.collision_control(mouse_pos, cable)
             if not cable.locked:

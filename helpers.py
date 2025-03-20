@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class Cable:
-    def __init__(self, anchor, screen, colour, segments=20, length=5):
+    def __init__(self, anchor, screen, colour, segments=20,segment_weight=0.5, length=5):
         # Init parameters
         self.lightning = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "lightning.png")), 0.1)
         self.lightning_enable = False
@@ -14,7 +14,7 @@ class Cable:
         self.lightning_show_for = 5 #seconds
         self.lightning_time_to_run = 0
         self.screen = screen
-        self.SEGMENTS, self.LENGTH = segments, length
+        self.SEGMENTS,self.segment_weight, self.LENGTH = segments,segment_weight, length
         self.GRAVITY = pygame.Vector2(0, 5.0)
         self.anchor = anchor
         self.points = [pygame.Vector2(anchor[0], anchor[1] + i * self.LENGTH) for i in range(self.SEGMENTS)]
@@ -125,12 +125,22 @@ class Cable:
             lightning_perturbation = pygame.Vector2(0, 0)
         return 3*lightning_perturbation
 
-    def get_force(self):
-        end = self.points[-1]
-        prev = self.points[-2]
-        direction = end - prev
-        self.unit_direction = direction.normalize()
-        return self.unit_direction #TODO hier schaal factor berekenen op basis van gewicht etc
+    def get_force_weight(self):
+        F = pygame.Vector2(0,0)
+        for i in range(len(self.points)-1):
+            a = len(self.points)-i-1
+            first = self.points[a]
+            sec = self.points[a-1]
+            dir = first - sec
+            dir = dir.normalize()
+            if first[1] <= sec[1]:
+                F[1] -= self.segment_weight
+            print(pygame.Vector2(0,self.segment_weight).project(dir).project(pygame.Vector2(1,0)))
+            F[0] += pygame.Vector2(0,self.segment_weight).project(dir).project(pygame.Vector2(1,0))[0]
+
+
+        print(f"{self.unit_direction}/{F.normalize()}")
+        return F
 
 class Wall:
     def __init__(self, screen, position, size, holes_positions, hole_size, hole_colors):
@@ -187,18 +197,21 @@ class Wall:
 
         # Check if cable end is inside the wall but NOT in the hole
         if self.check_collision(red_rect=cable.red_rect_rect):
-
             fe[0] = self.kc * (self.wall_rect.left - hx)
             proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
-
             if not cable.locked:
-
                 force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
                 pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
 
-        else:
-            self.entry_side = None  # Reset when outside the wall
+        elif self.check_in_hole(cable.red_rect_rect): #when in hole, do same thing with other value (x+22)
+            fe[0] = self.kc * (self.wall_rect.left+22 - hx)
+            proxy_pos = pygame.Vector2(self.wall_rect.left+22, hy)
+
+            if not cable.locked:
+                force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
+                pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
+
         return proxy_pos, fe  # Return adjusted position and force
 
 
@@ -209,7 +222,6 @@ class Wall:
 
 
 def plot_data(review_data):
-
     t = list()
     force = list()
     end_pos = list()
