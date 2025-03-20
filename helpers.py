@@ -197,16 +197,16 @@ class Wall:
 
         # Check if cable end is inside the wall but NOT in the hole
         if self.check_collision(red_rect=cable.red_rect_rect):
-            fe[0] = self.kc * (self.wall_rect.left - hx)
-            proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
+            fe[0] = self.kc * (self.wall_rect.left-22 - hx)
+            proxy_pos = pygame.Vector2(self.wall_rect.left-22, hy)
 
             if not cable.locked:
                 force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
                 pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
 
         elif self.check_in_hole(cable.red_rect_rect): #when in hole, do same thing with other value (x+22)
-            fe[0] = self.kc * (self.wall_rect.left+22 - hx)
-            proxy_pos = pygame.Vector2(self.wall_rect.left+22, hy)
+            fe[0] = self.kc * (self.wall_rect.left - hx)
+            proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
             if not cable.locked:
                 force_end = proxy_pos - fe * 0.01  # Scale factor for drawing

@@ -99,7 +99,7 @@ try:
         elif wall.check_collision(unlocked_cable.red_rect_rect) and not wall.check_in_hole(unlocked_cable.red_rect_rect):
             end_pos = (682 ,mouse_pos[1])
         elif wall.check_in_hole(unlocked_cable.red_rect_rect):
-            end_pos = (705 ,mouse_pos[1])
+            end_pos = (mouse_pos[0] ,mouse_pos[1])
         else:
             end_pos = mouse_pos
 
