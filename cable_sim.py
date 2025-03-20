@@ -27,7 +27,7 @@ cables = [
 ]
 
 wall_pos = (700,0)
-wall_size = (1200-wall_pos[0], 600)
+wall_size = (600, 600)
 hole_size = (22,10) # one pixel on each end bigger
 hole_pos = [(wall_pos[0]+(hole_size[0]/2), wall_size[1]/3),
             (wall_pos[0]+(hole_size[0]/2), wall_size[1]/2),
@@ -61,17 +61,6 @@ try:
             mouse_pos = pygame.mouse.get_pos()
         mouse_rect = pygame.rect.Rect(*mouse_pos, 1,1)
         
-        
-        unlocked_cable = cables[0]
-        for cable in cables:
-            if not cable.locked:
-                unlocked_cable = cable
-        if not wall.check_collision(mouse_rect):
-            end_pos = mouse_pos
-        elif wall.check_collision(red_rect=unlocked_cable.red_rect_rect):
-            end_pos = (700,mouse_pos[1])
-        else:
-            end_pos = mouse_pos
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -99,6 +88,21 @@ try:
                             cable.locked_position = pygame.Vector2(mouse_pos)
                             print("Locked")
 
+
+        unlocked_cable = cables[0]
+        for cable in cables:
+            if not cable.locked:
+                unlocked_cable = cable
+
+        if mouse_pos[0] < 680:
+            end_pos = mouse_pos
+        elif wall.check_collision(unlocked_cable.red_rect_rect) and not wall.check_in_hole(unlocked_cable.red_rect_rect):
+            end_pos = (682 ,mouse_pos[1])
+        elif wall.check_in_hole(unlocked_cable.red_rect_rect):
+            end_pos = (705 ,mouse_pos[1])
+        else:
+            end_pos = mouse_pos
+
         wall.draw()
 
         F_locked_cable = pygame.Vector2(0,0)
@@ -116,9 +120,9 @@ try:
             cable.update(end_pos)
             cable.draw()
 
-            # Check if cable end is inside the hole
-            if wall.check_collision(unlocked_cable.red_rect_rect):
-                print("Cable is through the hole!")
+            # Check if cable end is inside a hole
+            if wall.check_in_hole(unlocked_cable.red_rect_rect):
+                print("Cable is in a hole!")
 
             proxy_pos, F_wall_part = wall.collision_control(mouse_pos, cable)
             if not cable.locked:

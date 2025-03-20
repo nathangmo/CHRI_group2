@@ -22,6 +22,7 @@ class Cable:
         self.locked = True  # Initially locked
         self.locked_position = pygame.Vector2(anchor[0] + 100, anchor[1]) 
         self.colour = colour
+        self.unit_direction = pygame.Vector2(0, 0)
 
     def update(self, target):
         # Apply physics to each segment
@@ -64,14 +65,14 @@ class Cable:
         direction = end - prev
         angle = math.degrees(math.atan2(direction.y, direction.x))
 
-        unit_direction = direction.normalize()
+        self.unit_direction = direction.normalize()
 
         # --- Connector (Red Plug) ---
         rectangle = pygame.Surface((20, 8), pygame.SRCALPHA)
         rectangle.fill((216, 27, 96))
         rotated_rect = pygame.transform.rotate(rectangle, -angle)
         self.red_rect_rect = rotated_rect.get_rect()
-        self.red_rect_rect.center = end + unit_direction * 10
+        self.red_rect_rect.center = end + self.unit_direction * 10
 
         self.screen.blit(rotated_rect, self.red_rect_rect.topleft)
 
@@ -83,7 +84,7 @@ class Cable:
         self.green_square_rect = rotated_square.get_rect()
         self.green_square_rect.center = end
     
-        self.green_square_rect.center = end - unit_direction * 6
+        self.green_square_rect.center = end - self.unit_direction * 6
 
         self.screen.blit(rotated_square, self.green_square_rect.topleft)
 
@@ -96,9 +97,7 @@ class Cable:
             rotated_square = pygame.transform.rotate(pygame.transform.scale_by(self.lightning, (math.sin(time_to_run*math.pi*2)+1)/2), -angle)
 
             self.shock_square_rect = rotated_square.get_rect()
-            self.shock_square_rect.center = end + 24*unit_direction
-        
-            self.shock_square_rect.center = end+30*unit_direction - unit_direction * 6
+            self.shock_square_rect.center = end + 24*self.unit_direction
 
             self.screen.blit(rotated_square, self.shock_square_rect.topleft)
 
@@ -130,8 +129,8 @@ class Cable:
         end = self.points[-1]
         prev = self.points[-2]
         direction = end - prev
-        unit_direction = direction.normalize()
-        return unit_direction #TODO hier schaal factor berekenen op basis van gewicht etc
+        self.unit_direction = direction.normalize()
+        return self.unit_direction #TODO hier schaal factor berekenen op basis van gewicht etc
 
 class Wall:
     def __init__(self, screen, position, size, holes_positions, hole_size, hole_colors):
@@ -173,13 +172,15 @@ class Wall:
             return True
                 
         return False
+    
+    def check_in_hole(self, red_rect):
+        for hole_rect in self.holes_rects:
+            if hole_rect.colliderect(red_rect):
+                return True
+        return False
 
     def collision_control(self, cable_end_pos, cable):
         hx, hy = cable_end_pos  # Cable end position
-
-        # Store previous position
-        prev_hx, prev_hy = self.prev_xh
-        self.prev_xh = pygame.Vector2([hx, hy])
 
         proxy_pos = pygame.Vector2([hx, hy])
         fe = pygame.Vector2([0.0, 0.0])
