@@ -8,11 +8,13 @@ from Physics import Physics
 import time
 import json
 import datetime
+import math
 
 pygame.init()
 physics = Physics(hardware_version=3)
 device_connected = physics.is_device_connected()
 pygame.mouse.set_visible(False)
+font = pygame.font.Font(pygame.font.get_default_font(), 36)
 
 # Parameters
 W, H = 800, 600
@@ -20,11 +22,6 @@ window_scale = 4000
 screen = pygame.display.set_mode((W, H))
 pygame.display.set_caption("Cable Sim")
 
-cables = [
-    Cable((W // 6, H // 4), screen, (0, 77, 64)),
-    Cable((W // 6, H // 4 + 100), screen, (30, 136, 229)),
-    Cable((W // 6, H // 4 + 200), screen, (255, 193, 7))
-]
 
 wall_pos = (700,0)
 wall_size = (600, 600)
@@ -40,6 +37,13 @@ hole_colors = [
 ]
 wall = Wall(screen, wall_pos, wall_size,  hole_pos, hole_size, hole_colors)
 
+
+cables = [
+    Cable((W // 6, H // 4), screen, (0, 77, 64), target=hole_pos[0]),
+    Cable((W // 6, H // 4 + 100), screen, (30, 136, 229), target=hole_pos[1]),
+    Cable((W // 6, H // 4 + 200), screen, (255, 193, 7), target=hole_pos[2])
+]
+
 handle = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")), 0.75).convert_alpha(screen)
 cables[0].update((0,0))
 cables[0].draw_connector_end()
@@ -47,6 +51,7 @@ cables[0].draw_connector_end()
 shocks = 0
 review_data = list()
 start_time = time.time()
+score = 0
 
 run = True
 try:
@@ -75,18 +80,26 @@ try:
                             status = cable.check_hover_status(mouse_pos)
                             
                             if status == "red":
-                                print("Shocked")
                                 cable.enable_lightning(5)
                                 shocks += 1
                             elif status == "green":
-                                print("Safe")
                                 cable.locked = False 
                         
                         # Locking the cable to the current mouse position
                         else:
+                            if wall.check_in_hole(cable.red_rect_rect):
+                                accurracy = min(0,100-math.sqrt((cable.target[0]-cable.red_rect_rect.center[0])**2 + (cable.target[1]-cable.red_rect_rect.center[1])**2))
+                                print(f"Cable{cable.colour} scored {accurracy} points!")
+                                score -= cable.scored_points
+                                score += accurracy
+                                cable.scored_points = accurracy
+                            elif not wall.check_in_hole(cable.red_rect_rect) and cable.scored_points:
+                                print(f"Cable{cable.colour} removed {cable.scored_points} points!")
+                                score -= cable.scored_points
+                                cable.scored_points = 0
+
                             cable.locked = True
-                            cable.locked_position = pygame.Vector2(mouse_pos)
-                            print("Locked")
+                            cable.locked_position = pygame.Vector2(end_pos)
 
 
         unlocked_cable = cables[0]
@@ -99,7 +112,10 @@ try:
         elif wall.check_collision(unlocked_cable.red_rect_rect) and not wall.check_in_hole(unlocked_cable.red_rect_rect):
             end_pos = (682 ,mouse_pos[1])
         elif wall.check_in_hole(unlocked_cable.red_rect_rect):
-            end_pos = (mouse_pos[0] ,mouse_pos[1])
+            if mouse_pos[0] > 700:
+                end_pos = (700 ,mouse_pos[1])
+            else:
+                end_pos = (mouse_pos[0] ,mouse_pos[1])
         else:
             end_pos = mouse_pos
 
@@ -120,10 +136,6 @@ try:
             cable.update(end_pos)
             cable.draw()
 
-            # Check if cable end is inside a hole
-            if wall.check_in_hole(unlocked_cable.red_rect_rect):
-                print(f"Cable{unlocked_cable.colour} is in a hole!")
-
             proxy_pos, F_wall_part = wall.collision_control(mouse_pos, cable)
             if not cable.locked:
                 F_wall += F_wall_part
@@ -133,7 +145,9 @@ try:
             physics.update_force(F)
         
 
-        
+        text = f"score: {str(round(score-time.time()+start_time))}"
+        text_surface = font.render(text, True, (0, 0, 0))
+        screen.blit(text_surface, dest=(0,0))
 
         screen.blit(handle, handle.get_rect(center = mouse_pos))
         pygame.display.flip()
@@ -145,6 +159,7 @@ try:
         data['mouse_pos'] = mouse_pos
         data['end_pos'] = end_pos
         data['shocks'] = shocks
+        data['score'] = score-time.time()+start_time
         review_data.append(data)
 except Exception as e:
     print(f"Exception occured: {e}")

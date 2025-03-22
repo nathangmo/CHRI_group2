@@ -6,8 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class Cable:
-    def __init__(self, anchor, screen, colour, segments=20,segment_weight=0.5, length=5):
+    def __init__(self, anchor, screen, colour, target, segments=20,segment_weight=0.5, length=5):
         # Init parameters
+        self.scored_points = 0
+        self.target = target
         self.lightning = pygame.transform.scale_by(pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "lightning.png")), 0.1)
         self.lightning_enable = False
         self.lightning_enabled_on = time.time()
@@ -135,11 +137,7 @@ class Cable:
             dir = dir.normalize()
             if first[1] <= sec[1]:
                 F[1] -= self.segment_weight
-            print(pygame.Vector2(0,self.segment_weight).project(dir).project(pygame.Vector2(1,0)))
             F[0] += pygame.Vector2(0,self.segment_weight).project(dir).project(pygame.Vector2(1,0))[0]
-
-
-        print(f"{self.unit_direction}/{F.normalize()}")
         return F
 
 class Wall:
