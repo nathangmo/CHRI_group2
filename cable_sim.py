@@ -93,7 +93,7 @@ try:
                                 score -= cable.scored_points
                                 score += accurracy
                                 cable.scored_points = accurracy
-                                if cables[0].scored_points>0 and cables[1].scored_points>0 and cables[1].scored_points>0:
+                                if cables[0].scored_points>0 and cables[1].scored_points>0 and cables[2].scored_points>0:
                                     run = False
 
                             elif not wall.check_in_hole(cable.red_rect_rect) and cable.scored_points:
