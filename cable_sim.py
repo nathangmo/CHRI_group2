@@ -88,11 +88,14 @@ try:
                         # Locking the cable to the current mouse position
                         else:
                             if wall.check_in_hole(cable.red_rect_rect):
-                                accurracy = max(0,100-math.sqrt((cable.target[0]-cable.red_rect_rect.center[0])**2 + (cable.target[1]-cable.red_rect_rect.center[1])**2))
+                                accurracy = max(1,100-math.sqrt((cable.target[0]-cable.red_rect_rect.center[0])**2 + (cable.target[1]-cable.red_rect_rect.center[1])**2))
                                 print(f"Cable{cable.colour} scored {accurracy} points!")
                                 score -= cable.scored_points
                                 score += accurracy
                                 cable.scored_points = accurracy
+                                if cables[0].scored_points>0 and cables[1].scored_points>0 and cables[1].scored_points>0:
+                                    run = False
+
                             elif not wall.check_in_hole(cable.red_rect_rect) and cable.scored_points:
                                 print(f"Cable{cable.colour} removed {cable.scored_points} points!")
                                 score -= cable.scored_points
