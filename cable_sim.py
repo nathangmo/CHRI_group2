@@ -88,7 +88,7 @@ try:
                         # Locking the cable to the current mouse position
                         else:
                             if wall.check_in_hole(cable.red_rect_rect):
-                                accurracy = min(0,100-math.sqrt((cable.target[0]-cable.red_rect_rect.center[0])**2 + (cable.target[1]-cable.red_rect_rect.center[1])**2))
+                                accurracy = max(0,100-math.sqrt((cable.target[0]-cable.red_rect_rect.center[0])**2 + (cable.target[1]-cable.red_rect_rect.center[1])**2))
                                 print(f"Cable{cable.colour} scored {accurracy} points!")
                                 score -= cable.scored_points
                                 score += accurracy
