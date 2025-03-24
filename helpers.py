@@ -202,7 +202,7 @@ class Wall:
                 force_end = proxy_pos - fe * 0.01  # Scale factor for drawing
                 pygame.draw.line(self.screen, (0, 0, 255), proxy_pos, force_end, 2)
 
-        elif self.check_in_hole(cable.red_rect_rect): #when in hole, do same thing with other value (x+22)
+        elif self.check_in_hole(cable.red_rect_rect) and cable_end_pos[0] > 700:
             fe[0] = self.kc * (self.wall_rect.left - hx)
             proxy_pos = pygame.Vector2(self.wall_rect.left, hy)
 
