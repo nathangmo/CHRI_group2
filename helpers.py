@@ -142,12 +142,6 @@ class Cable:
 
 
 def assist_controller(cable, is_active):
-    """
-    Applies an assisting force to reduce the weight of the cable.
-
-    :param cable: The cable object being manipulated.
-    :param is_active: Boolean indicating if the controller is active.
-    """
     if is_active:
         assist_force = pygame.Vector2(0, -cable.segment_weight * 10)  # Upward lift
     else:
