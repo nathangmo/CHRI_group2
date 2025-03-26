@@ -140,6 +140,27 @@ class Cable:
             F[0] += pygame.Vector2(0,self.segment_weight).project(dir).project(pygame.Vector2(1,0))[0]
         return F
 
+
+def assist_controller(cable, is_active):
+    """
+    Applies an assisting force to reduce the weight of the cable.
+
+    :param cable: The cable object being manipulated.
+    :param is_active: Boolean indicating if the controller is active.
+    """
+    if is_active:
+        assist_force = pygame.Vector2(0, -cable.segment_weight * 10)  # Upward lift
+    else:
+        assist_force = pygame.Vector2(0, 0)
+
+    # Apply force to each segment except the anchor
+    for i in range(1, cable.SEGMENTS):
+        cable.points[i] += assist_force
+
+    return assist_force
+
+
+
 class Wall:
     def __init__(self, screen, position, size, holes_positions, hole_size, hole_colors):
         self.screen = screen
