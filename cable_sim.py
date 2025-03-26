@@ -5,6 +5,7 @@ from helpers import Cable
 from helpers import Wall
 from helpers import plot_data
 from helpers import assist_controller
+from helpers import special_control
 from Physics import Physics
 import time
 import json
@@ -54,6 +55,8 @@ review_data = list()
 start_time = time.time()
 score = 0
 assist_active = False
+special_active = False
+special_collision = False
 
 run = True
 try:
@@ -64,8 +67,13 @@ try:
 
         if device_connected:
             mouse_pos = physics.get_mouse_pos(window_scale=window_scale, window_size=(W, H))
+        
+        elif special_active and special_collision:
+            mouse_pos = physics.get_mouse_pos(window_scale=window_scale*2, window_size=(W, H))
         else:
             mouse_pos = pygame.mouse.get_pos()
+
+            
         mouse_rect = pygame.rect.Rect(*mouse_pos, 1, 1)
 
         for event in pygame.event.get():
@@ -109,6 +117,9 @@ try:
                             cable.locked_position = pygame.Vector2(end_pos)
                 elif event.key == ord('c'):
                     assist_active = not assist_active
+                    
+                elif event.key == ord('v'):
+                    special_active = not special_active
 
         unlocked_cable = cables[0]
         for cable in cables:
@@ -150,6 +161,8 @@ try:
 
         F_assist = assist_controller(unlocked_cable, assist_active)
         F = F_shock + F_locked_cable - F_wall + F_assist
+
+        special_collision = special_control(unlocked_cable, screen, hole_pos, special_active)
 
         if device_connected:
             physics.update_force(F)

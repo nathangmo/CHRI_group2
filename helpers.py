@@ -154,6 +154,27 @@ def assist_controller(cable, is_active):
     return assist_force
 
 
+def special_control(cable, screen, hole_pos, special_active):
+    special_collision = False
+    
+    if special_active:
+        overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)  
+
+        for pos in hole_pos:
+            pygame.draw.circle(overlay, (255, 69, 0, 80), (int(pos[0] - 11), int(pos[1])), 100)
+            
+            if pygame.Vector2(cable.points[-1]).distance_to(pygame.Vector2(pos)) < 100:
+                special_collision = True
+                
+            else:
+                special_collision = False
+
+        screen.blit(overlay, (0, 0))
+
+    return special_collision
+
+
+
 
 class Wall:
     def __init__(self, screen, position, size, holes_positions, hole_size, hole_colors):
