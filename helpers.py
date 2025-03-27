@@ -165,9 +165,6 @@ def special_control(cable, screen, hole_pos, special_active):
             
             if pygame.Vector2(cable.points[-1]).distance_to(pygame.Vector2(pos)) < 100:
                 special_collision = True
-                
-            else:
-                special_collision = False
 
         screen.blit(overlay, (0, 0))
 

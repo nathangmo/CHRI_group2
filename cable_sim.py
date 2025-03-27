@@ -57,6 +57,8 @@ score = 0
 assist_active = False
 special_active = False
 special_collision = False
+special_collision_last = False
+special_collision_point = (0,0)
 
 run = True
 try:
@@ -67,11 +69,13 @@ try:
 
         if device_connected:
             mouse_pos = physics.get_mouse_pos(window_scale=window_scale, window_size=(W, H))
-        
-        elif special_active and special_collision:
-            mouse_pos = physics.get_mouse_pos(window_scale=window_scale*2, window_size=(W, H))
         else:
             mouse_pos = pygame.mouse.get_pos()
+        
+        if special_active and special_collision:
+            mouse_pos0 = special_collision_point[0] + (mouse_pos[0]-special_collision_point[0])/2
+            mouse_pos1 = special_collision_point[1] + (mouse_pos[1]-special_collision_point[1])/2
+            mouse_pos = (mouse_pos0, mouse_pos1)
 
             
         mouse_rect = pygame.rect.Rect(*mouse_pos, 1, 1)
@@ -163,6 +167,11 @@ try:
         F = F_shock + F_locked_cable - F_wall + F_assist
 
         special_collision = special_control(unlocked_cable, screen, hole_pos, special_active)
+        if special_collision and not special_collision_last:
+            special_collision_point = end_pos
+            special_collision_last = True
+        if not special_collision:
+            special_collision_last = False
 
         if device_connected:
             physics.update_force(F)
