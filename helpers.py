@@ -25,6 +25,7 @@ class Cable:
         self.locked_position = pygame.Vector2(anchor[0] + 100, anchor[1]) 
         self.colour = colour
         self.unit_direction = pygame.Vector2(0, 0)
+        self.draw_connector_end()
 
     def update(self, target):
         # Apply physics to each segment
@@ -156,7 +157,7 @@ def assist_controller(cable, is_active):
 
 def special_control(cable, screen, hole_pos, special_active):
     special_collision = False
-    
+
     if special_active:
         overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)  
 

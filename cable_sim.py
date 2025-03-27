@@ -43,6 +43,7 @@ cables = [
     Cable((W // 6, H // 4 + 100), screen, (30, 136, 229), target=hole_pos[1]),
     Cable((W // 6, H // 4 + 200), screen, (255, 193, 7), target=hole_pos[2])
 ]
+dummy_cable = Cable((W // 6, H // 4), screen, (0, 77, 64), target=hole_pos[0])
 
 handle = pygame.transform.scale_by(
     pygame.image.load(os.path.join(os.path.dirname(os.path.realpath(__file__)), "assets", "handle.png")),
@@ -125,7 +126,7 @@ try:
                 elif event.key == ord('v'):
                     special_active = not special_active
 
-        unlocked_cable = cables[0]
+        unlocked_cable = dummy_cable
         for cable in cables:
             if not cable.locked:
                 unlocked_cable = cable
