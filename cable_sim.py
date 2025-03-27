@@ -164,8 +164,9 @@ try:
             if not cable.locked:
                 F_wall += F_wall_part
 
-        if not unlocked_cable.locked:
-            F_assist = assist_controller(unlocked_cable, assist_active)
+        if not unlocked_cable.locked and assist_active:
+            
+            F_assist = -0.7*F_locked_cable
         else:
             F_assist = pygame.Vector2(0,0)
 
@@ -210,4 +211,4 @@ pygame.quit()
 with open(f"Cable_data_{datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S')}.json", 'w') as file:
     json.dump(review_data, file)
 
-plot_data(review_data)
+# plot_data(review_data)
