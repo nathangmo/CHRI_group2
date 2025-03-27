@@ -164,7 +164,11 @@ try:
             if not cable.locked:
                 F_wall += F_wall_part
 
-        F_assist = assist_controller(unlocked_cable, assist_active)
+        if not unlocked_cable.locked:
+            F_assist = assist_controller(unlocked_cable, assist_active)
+        else:
+            F_assist = pygame.Vector2(0,0)
+
         F = F_shock + F_locked_cable - F_wall + F_assist
 
         special_collision = special_control(unlocked_cable, screen, hole_pos, special_active)
