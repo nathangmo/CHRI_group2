@@ -182,11 +182,14 @@ try:
         data['end_pos'] = end_pos
         data['shocks'] = shocks
         data['score'] = score - time.time() + start_time
+        data['assist_active'] = assist_active
+        data['special_active'] = special_active
         review_data.append(data)
 except Exception as e:
     print(f"Exception occured: {e}")
     traceback.print_exc()
 
+print(f"Total score: {score}")
 physics.close()
 pygame.quit()
 
