@@ -83,18 +83,33 @@ print(f"Pearson correlation: r={corr:.2f}, p={p_corr:.4f}")
 
 # Linear regression model for Score vs. Completion Time
 slope, intercept, r_value, p_value, std_err = stats.linregress(df['completion_time'], df['score'])
-
 print(f"Regression Model: Score = {slope:.2f} * Time + {intercept:.2f}")
 print(f"R-squared: {r_value**2:.3f}, p-value: {p_value:.4f}")
 
-# Scatter plot with regression line
-plt.figure(figsize=(10, 6))
-sns.regplot(x='completion_time', y='score', data=df, scatter_kws={'alpha': 0.6}, line_kws={'color': 'red', 'linewidth': 2})
-plt.xlabel("Completion Time (seconds)")
-plt.ylabel("Score (Accuracy)")
-plt.title("Score vs. Completion Time")
+# Scatter plot with regression line, color-coded by condition
+plt.figure(figsize=(12, 6))
+sns.set_style("whitegrid")
+palette = {'baseline': '#1f77b4', 'constant': '#ff7f0e', 'dynamic': '#2ca02c'}
+
+# Plot scatter with regression lines per condition
+sns.lmplot(x='completion_time',
+           y='score',
+           hue='condition',  # Color by condition
+           data=df,
+           palette=palette,
+           height=6,
+           aspect=1.5,
+           scatter_kws={'alpha': 0.7, 's': 80},
+           line_kws={'linewidth': 2})
+
+# Customize plot
+plt.xlabel("Completion Time (seconds)", fontsize=14)
+plt.ylabel("Score (Accuracy)", fontsize=14)
+plt.title("Score vs. Completion Time (Color-Coded by Condition)", fontsize=16)
 plt.grid(alpha=0.3)
-plt.savefig("score_vs_time.png", dpi=300)
+
+# Save and Show
+plt.savefig("score_vs_time_colored.png", dpi=300)
 plt.show()
 
 # Basic descriptive stats
@@ -197,7 +212,8 @@ plt.show()
 # Calculate z-scores for completion times
 df['time_zscore'] = np.abs(stats.zscore(df['completion_time']))
 
-# Find outlier threshold (3 standard deviations)
-outliers = df[df['time_zscore'] > 3]
-print("Potential outliers detected:")
-print(outliers[['user_id', 'trial_num', 'condition', 'completion_time', 'score']])
+# # Find outlier threshold (3 standard deviations)
+# outliers = df[df['time_zscore'] > 3]
+# print("Potential outliers detected:")
+# print(outliers[['user_id', 'trial_num', 'condition', 'completion_time', 'score']])
+#
